@@ -74,7 +74,9 @@ class _AuthWrapperState extends State<_AuthWrapper> {
           );
         }
 
-        return authVM.isAuthenticated ? const HomeScreen() : const LoginScreen();
+        return authVM.isAuthenticated
+            ? const HomeScreen()
+            : const LoginScreen();
       },
     );
   }
