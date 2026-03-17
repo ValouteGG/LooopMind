@@ -11,7 +11,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -22,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authVM = context.read<AuthViewModel>();
       if (authVM.user != null) {
-        context.read<TaskViewModel>().fetchTasks(authVM.user!.id);
+        context.read<TaskViewModel>().fetchTasks();
       }
     });
   }
@@ -110,7 +111,51 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             priority: task.priority.toString().split('.').last,
             timeRemaining: _formatTimeRemaining(task.deadline),
             onTap: () {
-              Navigator.of(context).pushNamed('/task-detail', arguments: task.id);
+              Navigator.of(context).pushNamed('/task-detail',
+                  arguments: {'id': task.id, 'mode': 'view'});
+            },
+            onEdit: () {
+              Navigator.of(context).pushNamed('/task-detail',
+                  arguments: {'id': task.id, 'mode': 'edit'});
+            },
+            onDelete: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Task'),
+                  content:
+                      Text('Are you sure you want to delete "${task.title}"?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Delete',
+                          style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                final taskVM = context.read<TaskViewModel>();
+                final success = await taskVM.deleteTask(task.id);
+                if (success) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Task deleted successfully')),
+                    );
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to delete task')),
+                    );
+                  }
+                }
+              }
             },
           ),
         );

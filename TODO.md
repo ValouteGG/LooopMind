@@ -1,17 +1,21 @@
-# Fix Program Errors - TODO List
+# Task: Make Task Details Editable and Deletable
 
-## Tasks:
-1. [x] Analyze project and identify errors (565 issues found)
-2. [x] Delete broken/corrupted view model files in subdirectories
-   - [x] lib/view_models/analytics/analytics_view_model.dart
-   - [x] lib/view_models/auth/auth_view_model.dart
-   - [x] lib/view_models/task/task_view_model.dart
-   - [x] lib/view_models/reflection/reflection_state.dart
-3. [x] Delete broken view file
-   - [x] lib/views/auth/login_view.dart
-4. [x] Add uuid dependency to pubspec.yaml
-5. [x] Fix profile_screen.dart - add missing methods
-6. [x] Fix task_detail_screen.dart - remove unnecessary null check
-7. [x] Fix test/widget_test.dart - update to use correct app name
-8. [x] Run flutter analyze to verify fixes - 12 info issues remaining (no errors)
+## Plan Breakdown into Steps
+
+✅ **Step 1: Create TODO.md** - Track progress (current)
+
+**Next Steps:**
+
+✅ **Step 2: Update lib/views/widgets/task_card.dart** - Added edit/delete icons with callbacks (complete)
+
+✅ **Step 3: Update lib/views/screens/home/home_screen.dart** - Delete confirmation & SnackBar, edit/view navigation with args (complete)
+
+✅ **Step 4: Major Update lib/views/screens/tasks/task_detail_screen.dart** - Added edit mode with form, update, delete (fixed linter)
+
+**Step 5: Test & Minor fixes**
+- flutter run, test create/edit/delete across tabs.
+- Update TODO.md with completion.
+- attempt_completion.
+
+**Step 6: (Optional) Enhance create_task_screen for consistency, routes if needed.**
 
