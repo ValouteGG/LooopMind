@@ -27,9 +27,11 @@ class AppRoutes {
       case createTask:
         return MaterialPageRoute(builder: (_) => const CreateTaskScreen());
       case taskDetail:
-        final taskId = settings.arguments as String;
+        final args = settings.arguments as Map<String, dynamic>;
+        final String taskId = args['id'] as String;
+        final String mode = args['mode'] as String? ?? 'view';
         return MaterialPageRoute(
-          builder: (_) => TaskDetailScreen(taskId: taskId),
+          builder: (_) => TaskDetailScreen(taskId: taskId, mode: mode),
         );
       case analytics:
         return MaterialPageRoute(builder: (_) => const AnalyticsScreen());

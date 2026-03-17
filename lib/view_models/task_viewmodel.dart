@@ -16,18 +16,18 @@ class TaskViewModel extends ChangeNotifier {
   List<TaskModel> get todaysTasks {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    return _tasks
-        .where((task) {
-          final deadline = DateTime(task.deadline.year, task.deadline.month, task.deadline.day);
-          return deadline.compareTo(today) == 0;
-        })
-        .toList();
+    return _tasks.where((task) {
+      final deadline =
+          DateTime(task.deadline.year, task.deadline.month, task.deadline.day);
+      return deadline.compareTo(today) == 0;
+    }).toList();
   }
 
   List<TaskModel> get upcomingTasks {
     final now = DateTime.now();
     return _tasks
-        .where((task) => task.deadline.isAfter(now) && task.status != TaskStatus.completed)
+        .where((task) =>
+            task.deadline.isAfter(now) && task.status != TaskStatus.completed)
         .toList()
       ..sort((a, b) => a.deadline.compareTo(b.deadline));
   }
@@ -36,7 +36,7 @@ class TaskViewModel extends ChangeNotifier {
     return _tasks.where((task) => task.status == TaskStatus.completed).toList();
   }
 
-  Future<void> fetchTasks(String userId) async {
+  Future<void> fetchTasks() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -49,7 +49,7 @@ class TaskViewModel extends ChangeNotifier {
       _tasks.addAll([
         TaskModel(
           id: const Uuid().v4(),
-          userId: userId,
+          userId: 'demo',
           title: 'Mathematics - Calculus',
           description: 'Chapter 5: Derivatives and Applications',
           deadline: DateTime.now().add(const Duration(days: 2)),
@@ -62,7 +62,7 @@ class TaskViewModel extends ChangeNotifier {
         ),
         TaskModel(
           id: const Uuid().v4(),
-          userId: userId,
+          userId: 'demo',
           title: 'History Essay',
           description: 'World War II: Causes and Consequences',
           deadline: DateTime.now().add(const Duration(days: 4)),
@@ -75,7 +75,7 @@ class TaskViewModel extends ChangeNotifier {
         ),
         TaskModel(
           id: const Uuid().v4(),
-          userId: userId,
+          userId: 'demo',
           title: 'Chemistry Lab',
           description: 'Organic Synthesis Experiment',
           deadline: DateTime.now().add(const Duration(days: 7)),
