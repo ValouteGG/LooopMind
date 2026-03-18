@@ -4,6 +4,8 @@ import 'routes/app_routes.dart';
 import 'view_models/auth_viewmodel.dart';
 import 'view_models/task_viewmodel.dart';
 import 'view_models/analytics_viewmodel.dart';
+import 'view_models/settings_viewmodel.dart';
+import 'view_models/theme_viewmodel.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/home/home_screen.dart';
 
@@ -21,13 +23,19 @@ class LoopMindApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => TaskViewModel()),
         ChangeNotifierProvider(create: (_) => AnalyticsViewModel()),
+        ChangeNotifierProvider(create: (_) => SettingsViewModel()),
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
-      child: MaterialApp(
-        title: 'LoopMind',
-        theme: _buildTheme(),
-        onGenerateRoute: AppRoutes.generateRoute,
-        home: const _AuthWrapper(),
-        debugShowCheckedModeBanner: false,
+      child: Builder(
+        builder: (context) => MaterialApp(
+          title: 'LoopMind',
+          theme: _buildTheme(),
+          darkTheme: _buildDarkTheme(),
+          themeMode: context.watch<ThemeViewModel>().currentMode,
+          onGenerateRoute: AppRoutes.generateRoute,
+          home: const _AuthWrapper(),
+          debugShowCheckedModeBanner: false,
+        ),
       ),
     );
   }
@@ -38,6 +46,21 @@ class LoopMindApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF6366F1),
         brightness: Brightness.light,
+      ),
+      fontFamily: 'Poppins',
+      appBarTheme: const AppBarTheme(
+        elevation: 0,
+        centerTitle: true,
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF6366F1),
+        brightness: Brightness.dark,
       ),
       fontFamily: 'Poppins',
       appBarTheme: const AppBarTheme(

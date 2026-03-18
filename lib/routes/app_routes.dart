@@ -6,6 +6,9 @@ import '../views/screens/tasks/create_task_screen.dart';
 import '../views/screens/tasks/task_detail_screen.dart';
 import '../views/screens/analytics/analytics_screen.dart';
 import '../views/screens/profile/profile_screen.dart';
+import '../views/screens/profile/edit_profile_screen.dart';
+import '../views/screens/profile/about_screen.dart';
+import '../views/screens/chat/chat_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -15,6 +18,9 @@ class AppRoutes {
   static const String taskDetail = '/task-detail';
   static const String analytics = '/analytics';
   static const String profile = '/profile';
+  static const String chat = '/chat';
+  static const String editProfile = '/edit-profile';
+  static const String about = '/about';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -37,6 +43,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const AnalyticsScreen());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case chat:
+        return MaterialPageRoute(builder: (_) => const ChatScreen());
+      case editProfile:
+        return MaterialPageRoute(builder: (_) => const EditProfileScreen());
+      case about:
+        return MaterialPageRoute(builder: (_) => const AboutScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

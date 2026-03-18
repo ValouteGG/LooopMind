@@ -1,21 +1,13 @@
-# Task: Make Task Details Editable and Deletable
+# Profile Page Enhancements
 
-## Plan Breakdown into Steps
-
-✅ **Step 1: Create TODO.md** - Track progress (current)
-
-**Next Steps:**
-
-✅ **Step 2: Update lib/views/widgets/task_card.dart** - Added edit/delete icons with callbacks (complete)
-
-✅ **Step 3: Update lib/views/screens/home/home_screen.dart** - Delete confirmation & SnackBar, edit/view navigation with args (complete)
-
-✅ **Step 4: Major Update lib/views/screens/tasks/task_detail_screen.dart** - Added edit mode with form, update, delete (fixed linter)
-
-**Step 5: Test & Minor fixes**
-- flutter run, test create/edit/delete across tabs.
-- Update TODO.md with completion.
-- attempt_completion.
-
-**Step 6: (Optional) Enhance create_task_screen for consistency, routes if needed.**
-
+## Steps:
+- [x] 1. Add shared_preferences to pubspec.yaml
+- [x] 2. Create lib/view_models/settings_viewmodel.dart
+- [x] 3. Create lib/view_models/theme_viewmodel.dart
+- [x] 4. Update lib/main.dart (add providers, theme builder)
+- [x] 5. Update lib/view_models/auth_viewmodel.dart (add updateUser)
+- [x] 6. Create lib/views/screens/profile/edit_profile_screen.dart
+- [x] 7. Create lib/views/screens/profile/about_screen.dart
+- [x] 8. Update lib/routes/app_routes.dart (add routes)
+- [x] 9. Update lib/views/screens/profile/profile_screen.dart (make functional)
+- [x] 10. flutter pub get & test
