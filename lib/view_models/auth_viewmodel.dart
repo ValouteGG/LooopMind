@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
+  final SupabaseClient _supabase = Supabase.instance.client;
   UserModel? _user;
   bool _isLoading = false;
   String? _error;
@@ -11,16 +13,53 @@ class AuthViewModel extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _user != null;
 
-  // Demo credentials
-  static const String demoEmail = 'demo@loopmind.com';
-  static const String demoPassword = 'password123';
-
   Future<void> checkAuthStatus() async {
     _isLoading = true;
     notifyListeners();
 
-    // Simulate checking auth status
-    await Future.delayed(const Duration(milliseconds: 500));
+    final session = _supabase.auth.currentSession;
+    if (session != null && session.user.id.isNotEmpty) {
+      try {
+        final response = await _supabase
+            .from('profiles')
+            .select()
+            .eq('id', session.user.id)
+            .maybeSingle(); // Use maybeSingle to handle missing profile
+
+        if (response != null) {
+          _user = UserModel(
+            id: response['id'] as String,
+            email: session.user.email ?? '',
+            name: response['name'] as String? ?? '',
+            photoUrl: response['photo_url'] as String?,
+            createdAt: DateTime.parse(response['created_at'].toString()),
+            updatedAt: DateTime.parse(response['updated_at'].toString()),
+          );
+        } else {
+          _user = UserModel(
+            id: session.user.id,
+            email: session.user.email ?? '',
+            name: '',
+            photoUrl: null,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          );
+        }
+      } catch (e) {
+        print('Profile fetch error: $e');
+        // Fallback user without profile
+        _user = UserModel(
+          id: session.user.id,
+          email: session.user.email ?? '',
+          name: '',
+          photoUrl: null,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+      }
+    } else {
+      _user = null;
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -32,33 +71,26 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate login delay
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      // Demo login validation
-      if (email == demoEmail && password == demoPassword) {
-        _user = UserModel(
-          id: 'user_123',
-          email: email,
-          name: 'Demo User',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
-        _isLoading = false;
-        notifyListeners();
-        return true;
+      await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      await checkAuthStatus();
+      return true;
+    } on AuthException catch (e) {
+      if (e.message.contains('Invalid login credentials') ||
+          e.message.contains('Invalid password')) {
+        _error = 'Incorrect email or password';
       } else {
-        _error =
-            'Invalid email or password. Try demo@loopmind.com / password123';
-        _isLoading = false;
-        notifyListeners();
-        return false;
+        _error = 'Login failed: ${e.message}';
       }
+      return false;
     } catch (e) {
       _error = 'Login failed: ${e.toString()}';
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
@@ -68,31 +100,41 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate signup delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
 
-      if (email.isEmpty || password.isEmpty || name.isEmpty) {
-        _error = 'Please fill all fields';
-        _isLoading = false;
-        notifyListeners();
+      if (response.user != null) {
+        await _supabase.from('profiles').upsert({
+          'id': response.user!.id,
+          'name': name,
+        });
+        _error =
+            'Signup successful! Please check your email to confirm your account.';
+      } else {
+        _error =
+            'Signup response missing user. Check Supabase settings (email confirmation may be enabled).';
         return false;
       }
 
-      _user = UserModel(
-        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-        email: email,
-        name: name,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      _isLoading = false;
-      notifyListeners();
+      await checkAuthStatus();
       return true;
+    } on AuthException catch (e) {
+      if (e.message.contains('already registered') ||
+          e.message.contains('duplicate key') ||
+          e.message.contains('already exists')) {
+        _error = 'User already exists';
+      } else {
+        _error = 'Sign up failed: ${e.message}';
+      }
+      return false;
     } catch (e) {
       _error = 'Sign up failed: ${e.toString()}';
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
@@ -101,8 +143,7 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate logout delay
-      await Future.delayed(const Duration(milliseconds: 500));
+      await _supabase.auth.signOut();
       _user = null;
       _error = null;
     } catch (e) {
@@ -116,8 +157,10 @@ class AuthViewModel extends ChangeNotifier {
   Future<bool> updateUser(String name) async {
     if (_user == null) return false;
     try {
-      await Future.delayed(
-          const Duration(milliseconds: 500)); // Simulate update
+      await _supabase
+          .from('profiles')
+          .upsert({'id': _user!.id, 'name': name}).eq('id', _user!.id);
+
       _user = _user!.copyWith(name: name, updatedAt: DateTime.now());
       notifyListeners();
       return true;

@@ -9,7 +9,13 @@ import 'view_models/theme_viewmodel.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/home/home_screen.dart';
 
-void main() {
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+      url: 'https://eajdvrukcjkkfcjaxqeb.supabase.co',
+      anonKey: 'sb_publishable_vfmWmfQz5w_91mGasyrzLw_4y0KLZ9k');
   runApp(const LoopMindApp());
 }
 
