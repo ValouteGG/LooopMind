@@ -18,10 +18,10 @@ class AuthViewModel extends ChangeNotifier {
   Future<void> checkAuthStatus() async {
     _isLoading = true;
     notifyListeners();
-    
+
     // Simulate checking auth status
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     _isLoading = false;
     notifyListeners();
   }
@@ -48,7 +48,8 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _error = 'Invalid email or password. Try demo@loopmind.com / password123';
+        _error =
+            'Invalid email or password. Try demo@loopmind.com / password123';
         _isLoading = false;
         notifyListeners();
         return false;
@@ -110,6 +111,21 @@ class AuthViewModel extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<bool> updateUser(String name) async {
+    if (_user == null) return false;
+    try {
+      await Future.delayed(
+          const Duration(milliseconds: 500)); // Simulate update
+      _user = _user!.copyWith(name: name, updatedAt: DateTime.now());
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = 'Update failed: $e';
+      notifyListeners();
+      return false;
+    }
   }
 
   void clearError() {

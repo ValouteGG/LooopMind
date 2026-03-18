@@ -39,6 +39,12 @@ class _HomeScreenState extends State<HomeScreen>
             onPressed: () {},
           ),
           IconButton(
+            icon: const Icon(Icons.chat_bubble_outline),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/chat');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.account_circle),
             onPressed: () {
               Navigator.of(context).pushNamed('/profile');
