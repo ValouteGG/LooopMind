@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/task_viewmodel.dart';
 import '../../../view_models/auth_viewmodel.dart';
+import '../../../models/task_model.dart';
 import '../../widgets/task_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,20 +13,15 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authVM = context.read<AuthViewModel>();
-      if (authVM.user != null) {
-        context.read<TaskViewModel>().fetchTasks();
-      }
+      _fetchTasks();
     });
   }
 
@@ -33,71 +30,96 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('LoopMind'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Today'),
+            Tab(text: 'Upcoming'),
+            Tab(text: 'Completed'),
+          ],
+        ),
         actions: [
+          IconButton(icon: const Icon(Icons.notifications), onPressed: () {}),
           IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
+              icon: const Icon(Icons.chat_bubble_outline),
+              onPressed: () => Navigator.pushNamed(context, '/chat')),
           IconButton(
-            icon: const Icon(Icons.chat_bubble_outline),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/chat');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            onPressed: () {
-              Navigator.of(context).pushNamed('/profile');
-            },
-          ),
+              icon: const Icon(Icons.account_circle),
+              onPressed: () => Navigator.pushNamed(context, '/profile')),
         ],
       ),
-      body: Column(
-        children: [
-          TabBar(
+      body: Consumer2<TaskViewModel, AuthViewModel>(
+        builder: (context, taskVM, authVM, _) {
+          return TabBarView(
             controller: _tabController,
-            tabs: const [
-              Tab(text: 'Today'),
-              Tab(text: 'Upcoming'),
-              Tab(text: 'Completed'),
+            children: [
+              _buildTasksTab(taskVM.todaysTasks, taskVM),
+              _buildTasksTab(taskVM.upcomingTasks, taskVM),
+              _buildTasksTab(taskVM.completedTasks, taskVM),
             ],
-          ),
-          Expanded(
-            child: Consumer<TaskViewModel>(
-              builder: (context, taskVM, _) {
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildTaskList(taskVM.todaysTasks, context),
-                    _buildTaskList(taskVM.upcomingTasks, context),
-                    _buildTaskList(taskVM.completedTasks, context),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/create-task');
+          );
         },
-        child: const Icon(Icons.add),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.pushNamed(context, '/create-task'),
+        icon: const Icon(Icons.add),
+        label: const Text('New Task'),
+        backgroundColor: Colors.blue,
       ),
     );
   }
 
-  Widget _buildTaskList(List<dynamic> tasks, BuildContext context) {
+  Widget _buildTasksTab(List<TaskModel> tasks, TaskViewModel taskVM) {
+    if (taskVM.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (taskVM.error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error, size: 80, color: Colors.red.shade400),
+            const SizedBox(height: 16),
+            Text(
+              'Error: ${taskVM.error}',
+              style: TextStyle(fontSize: 16, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: taskVM.clearError,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
     if (tasks.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.task_alt, size: 64, color: Colors.grey.shade300),
-            const SizedBox(height: 16),
-            const Text(
-              'No tasks yet',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            Icon(
+              Icons.task_alt_outlined,
+              size: 80,
+              color: Colors.grey.shade400,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No tasks here',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Get started with a new task!',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade500,
+              ),
             ),
           ],
         ),
@@ -110,77 +132,114 @@ class _HomeScreenState extends State<HomeScreen>
       itemBuilder: (context, index) {
         final task = tasks[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.only(bottom: 16),
           child: TaskCard(
-            title: task.title,
-            description: task.description,
-            priority: task.priority.toString().split('.').last,
-            timeRemaining: _formatTimeRemaining(task.deadline),
-            onTap: () {
-              Navigator.of(context).pushNamed('/task-detail',
-                  arguments: {'id': task.id, 'mode': 'view'});
-            },
-            onEdit: () {
-              Navigator.of(context).pushNamed('/task-detail',
-                  arguments: {'id': task.id, 'mode': 'edit'});
-            },
-            onDelete: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Delete Task'),
-                  content:
-                      Text('Are you sure you want to delete "${task.title}"?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Delete',
-                          style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                ),
-              );
-              if (confirm == true) {
-                final taskVM = context.read<TaskViewModel>();
-                final success = await taskVM.deleteTask(task.id);
-                if (success) {
-                  if (context.mounted) {
+            task: task,
+            onMarkDone: task.completed
+                ? null
+                : () async {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Task deleted successfully')),
+                      const SnackBar(content: Text('Marking task as done...')),
                     );
-                  }
-                } else {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Failed to delete task')),
+                    final updatedTask = task.copyWith(
+                      completed: true,
+                      completedAt: DateTime.now(),
+                      updatedAt: DateTime.now(),
                     );
-                  }
-                }
-              }
-            },
+                    final success = await taskVM.updateTask(updatedTask);
+                    SchedulerBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Task completed! 🎉'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    'Update failed: ${taskVM.error ?? "Unknown"}')),
+                          );
+                        }
+                      }
+                    });
+                  },
+            onEdit: () => Navigator.pushNamed(
+              context,
+              '/task-detail',
+              arguments: {'id': task.id, 'mode': 'edit'},
+            ),
+            onDelete: () => _showDeleteDialog(context, task, taskVM),
           ),
         );
       },
     );
   }
 
-  String _formatTimeRemaining(DateTime deadline) {
-    final now = DateTime.now();
-    final difference = deadline.difference(now);
+  void _showDeleteDialog(
+      BuildContext context, TaskModel task, TaskViewModel taskVM) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const SizedBox(width: 8),
+            Expanded(child: Text('Delete Task')),
+          ],
+        ),
+        content: Text('"${task.title}" will be permanently deleted.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Deleting task...')),
+              );
+              final success = await taskVM.deleteTask(task.id);
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Task deleted successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Delete failed: ${taskVM.error ?? "Unknown"}')),
+                    );
+                  }
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (difference.inDays > 0) {
-      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''}';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''}';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} min';
-    } else {
-      return 'Overdue';
+  Future<void> _fetchTasks() async {
+    if (!mounted) return;
+    final taskVM = context.read<TaskViewModel>();
+    final authVM = context.read<AuthViewModel>();
+    if (authVM.isAuthenticated &&
+        authVM.user?.id != null &&
+        taskVM.tasks.isEmpty &&
+        !taskVM.isLoading) {
+      await taskVM.fetchTasks(authVM.user!.id);
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../services/groq_service.dart';
 
 enum MessageType { user, bot }
 
@@ -19,36 +20,55 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [
     Message(
-        text: "Hello! Welcome to LoopMind AI Chat Demo.",
+        text:
+            "Hey!! Im here to help you generate weekly summaries based on your completed tasks. Try asking me for a summary of your week! Just tell me to generate and i will!📝",
         type: MessageType.bot),
   ];
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_controller.text.trim().isEmpty) return;
+
+    final message = _controller.text.trim().toLowerCase();
 
     setState(() {
       _messages
           .add(Message(text: _controller.text.trim(), type: MessageType.user));
     });
 
-    // Mock bot response
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _messages.add(Message(
-            text:
-                "This is a demo response. Soon to be powered by real AI! Your message: \${_controller.text.trim()}",
-            type: MessageType.bot,
-          ));
-        });
-        _scrollToBottom();
-      }
-    });
-
     _controller.clear();
     _scrollToBottom();
+
+    String response;
+    if (message.contains('summary')) {
+      // AI loading
+      setState(() {
+        _messages.add(Message(
+            text: 'Generating your weekly summary💪!', type: MessageType.bot));
+      });
+      _scrollToBottom();
+
+      if (!mounted) return;
+
+      response = await _generateWeeklySummary(_controller.text.trim());
+      setState(() {
+        _messages
+            .removeWhere((m) => m.text == 'Generating your weekly summary💪!');
+      });
+    } else {
+      response =
+          "I only generate weekly summaries. Try mentioning 'summary' in your prompt! 📝";
+    }
+
+    if (mounted) {
+      _messages.add(Message(text: response, type: MessageType.bot));
+      _scrollToBottom();
+    }
+  }
+
+  Future<String> _generateWeeklySummary(String prompt) async {
+    return GroqService().generateWeeklySummary(prompt);
   }
 
   void _scrollToBottom() {
@@ -67,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Chat Demo'),
+        title: const Text('Weekly Acitivy Summarizer'),
       ),
       body: Column(
         children: [
@@ -111,11 +131,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message...',
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                    decoration: const InputDecoration(
+                      hintText: 'Type a message for the summarizer...',
+                      border: OutlineInputBorder(),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),

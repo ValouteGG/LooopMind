@@ -18,20 +18,45 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
-  DateTime _selectedDeadline = DateTime.now().add(const Duration(days: 1));
+  DateTime _selectedDeadline = DateTime.now();
   TaskPriority _selectedPriority = TaskPriority.medium;
-  TaskCategory _selectedCategory = TaskCategory.other;
-  int _estimatedDuration = 60;
+  Future<void> _createTask() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+
+      final taskVM = context.read<TaskViewModel>();
+      final authVM = context.read<AuthViewModel>();
+
+      final task = TaskModel(
+        id: const Uuid().v4(),
+        userId: authVM.user!.id,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
+            ? null
+            : _descriptionController.text.trim(),
+        deadline: _selectedDeadline,
+        priority: _selectedPriority,
+        streakBonus: 1,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      final success = await taskVM.createTask(task);
+      if (success) {
+        if (mounted) Navigator.pop(context);
+      }
+
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Task'),
-        leading: BackButton(onPressed: () => Navigator.pop(context)),
-      ),
-      body: SingleChildScrollView(
+      appBar: AppBar(title: const Text('Create Task')),
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
@@ -41,127 +66,75 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               CustomTextField(
                 controller: _titleController,
                 label: 'Task Title',
-                hintText: 'e.g., Mathematics Chapter 5',
-                validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Title is required';
-                  return null;
-                },
+                hintText: 'e.g., Mathematics',
               ),
               const SizedBox(height: 20),
               CustomTextField(
                 controller: _descriptionController,
                 label: 'Description',
-                hintText: 'Add more details about the task',
+                hintText: 'Details...',
               ),
               const SizedBox(height: 20),
-              const Text('Category', style: TextStyle(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              DropdownButton<TaskCategory>(
-                value: _selectedCategory,
-                isExpanded: true,
-                items: TaskCategory.values
-                    .map((category) => DropdownMenuItem(
-                          value: category,
-                          child: Text(category.toString().split('.').last),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() => _selectedCategory = value!);
-                },
-              ),
-              const SizedBox(height: 20),
-              const Text('Priority', style: TextStyle(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
+              const Text('Priority',
+                  style: TextStyle(fontWeight: FontWeight.w600)),
               DropdownButton<TaskPriority>(
                 value: _selectedPriority,
                 isExpanded: true,
                 items: TaskPriority.values
-                    .map((priority) => DropdownMenuItem(
-                          value: priority,
-                          child: Text(priority.toString().split('.').last),
+                    .map((p) => DropdownMenuItem(
+                          value: p,
+                          child:
+                              Text(p.toString().split('.').last.toUpperCase()),
                         ))
                     .toList(),
-                onChanged: (value) {
-                  setState(() => _selectedPriority = value!);
-                },
+                onChanged: (v) => setState(() => _selectedPriority = v!),
               ),
+              const SizedBox(height: 20),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Estimated Duration (minutes)',
+                  const Text('Deadline',
                       style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text('$_estimatedDuration min'),
+                  Text('${_selectedDeadline.day}/${_selectedDeadline.month}'),
                 ],
               ),
-              Slider(
-                value: _estimatedDuration.toDouble(),
-                min: 15,
-                max: 240,
-                divisions: 45,
-                label: '$_estimatedDuration min',
-                onChanged: (value) {
-                  setState(() => _estimatedDuration = value.toInt());
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDeadline,
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 365)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null)
+                    setState(() => _selectedDeadline = picked);
                 },
+                icon: const Icon(Icons.calendar_today),
+                label: const Text('Pick Date'),
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Deadline', style: TextStyle(fontWeight: FontWeight.w600)),
-                  Text(
-                    '${_selectedDeadline.day}/${_selectedDeadline.month}/${_selectedDeadline.year}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 40),
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDeadline,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (picked != null) {
-                      setState(() => _selectedDeadline = picked);
-                    }
-                  },
-                  child: const Text('Change Deadline'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  onPressed: _isLoading ? null : _createTask,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white)),
+                        )
+                      : const Text('Create Task',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                 ),
-              ),
-              const SizedBox(height: 30),
-              Consumer2<TaskViewModel, AuthViewModel>(
-                builder: (context, taskVM, authVM, _) {
-                  return CustomButton(
-                    text: taskVM.isLoading ? 'Creating...' : 'Create Task',
-                    isLoading: taskVM.isLoading,
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate() && authVM.user != null) {
-                        final task = TaskModel(
-                          id: const Uuid().v4(),
-                          userId: authVM.user!.id,
-                          title: _titleController.text,
-                          description: _descriptionController.text,
-                          deadline: _selectedDeadline,
-                          estimatedDuration: _estimatedDuration,
-                          priority: _selectedPriority,
-                          category: _selectedCategory,
-                          createdAt: DateTime.now(),
-                          updatedAt: DateTime.now(),
-                        );
-
-                        final success = await taskVM.createTask(task);
-                        if (success && mounted) {
-                          Navigator.pop(context);
-                        }
-                      }
-                    },
-                  );
-                },
               ),
             ],
           ),
