@@ -1,12 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:phonebook_app/main.dart';
+import 'package:loopmind/main.dart';
 
 void main() {
-  testWidgets('App loads successfully', (WidgetTester tester) async {
-    // build our app and trigger a frame.
+  testWidgets('LoopMindApp renders correctly', (WidgetTester tester) async {
     await tester.pumpWidget(const LoopMindApp());
-
-    // verify that the app loads.
-    await tester.pump();
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

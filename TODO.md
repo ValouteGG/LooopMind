@@ -1,13 +1,7 @@
-# Fix Supabase Signup Null Error Task
+# Task: Enable past date selection for tasks
 
 ## Steps:
-- [x] Step 1: Create TODO.md ✓
-- [x] Step 2: Read auth_viewmodel.dart (already done) ✓
-- [x] Step 3: Edit lib/view_models/auth_viewmodel.dart to fix null safety in signup and checkAuthStatus ✓
-- [ ] Step 4: Test signup functionality
-- [ ] Step 5: Complete task
-
-Progress will be updated after each step.
-
-Run `flutter run` to test the fixed signup. If email confirmation is enabled in Supabase, check your email. No lint errors - task complete.
-
+- [x] Step 1: Edit lib/views/screens/tasks/create_task_screen.dart (update deadline init and date picker firstDate)
+- [x] Step 2: Edit lib/views/screens/tasks/task_detail_screen.dart (update date picker firstDate)
+- [ ] Step 3: Test changes by creating/editing tasks with past dates
+- [ ] Step 4: Complete task

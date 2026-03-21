@@ -32,12 +32,12 @@ class LoopMindApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SettingsViewModel()),
         ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
-      child: Builder(
-        builder: (context) => MaterialApp(
+      child: Consumer<ThemeViewModel>(
+        builder: (context, themeVM, child) => MaterialApp(
           title: 'LoopMind',
           theme: _buildTheme(),
           darkTheme: _buildDarkTheme(),
-          themeMode: context.watch<ThemeViewModel>().currentMode,
+          themeMode: themeVM.currentMode,
           onGenerateRoute: AppRoutes.generateRoute,
           home: const _AuthWrapper(),
           debugShowCheckedModeBanner: false,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ThemeViewModel extends ChangeNotifier {
-  ThemeMode _mode = ThemeMode.system;
+  ThemeMode _mode = ThemeMode.light;
 
   ThemeMode get currentMode => _mode;
 
@@ -11,17 +11,7 @@ class ThemeViewModel extends ChangeNotifier {
   }
 
   void toggle() {
-    switch (_mode) {
-      case ThemeMode.system:
-        _mode = ThemeMode.dark;
-        break;
-      case ThemeMode.light:
-        _mode = ThemeMode.dark;
-        break;
-      case ThemeMode.dark:
-        _mode = ThemeMode.light;
-        break;
-    }
+    _mode = _mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     notifyListeners();
   }
 }

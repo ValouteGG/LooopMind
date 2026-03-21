@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/task_model.dart';
-import 'package:uuid/uuid.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../models/task_model.dart';
 
 class TaskViewModel extends ChangeNotifier {
-  final List<TaskModel> _tasks = [];
+  final SupabaseClient _supabase = Supabase.instance.client;
+  List<TaskModel> _tasks = [];
   TaskModel? _selectedTask;
   bool _isLoading = false;
   String? _error;
@@ -15,83 +16,42 @@ class TaskViewModel extends ChangeNotifier {
 
   List<TaskModel> get todaysTasks {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    return _tasks.where((task) {
-      final deadline =
-          DateTime(task.deadline.year, task.deadline.month, task.deadline.day);
-      return deadline.compareTo(today) == 0;
-    }).toList();
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    return _tasks
+        .where((task) => task.deadline.isBefore(endOfToday) && !task.completed)
+        .toList()
+      ..sort((a, b) => a.deadline.compareTo(b.deadline));
   }
 
   List<TaskModel> get upcomingTasks {
     final now = DateTime.now();
     return _tasks
-        .where((task) =>
-            task.deadline.isAfter(now) && task.status != TaskStatus.completed)
+        .where((task) => task.deadline.isAfter(now) && !task.completed)
         .toList()
       ..sort((a, b) => a.deadline.compareTo(b.deadline));
   }
 
   List<TaskModel> get completedTasks {
-    return _tasks.where((task) => task.status == TaskStatus.completed).toList();
+    return _tasks.where((task) => task.completed).toList();
   }
 
-  Future<void> fetchTasks() async {
+  Future<void> fetchTasks(String userId) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Simulate fetch delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _supabase
+          .from('tasks')
+          .select()
+          .eq('user_id', userId)
+          .order('deadline', ascending: true);
 
-      _tasks.clear();
-      _tasks.addAll([
-        TaskModel(
-          id: const Uuid().v4(),
-          userId: 'demo',
-          title: 'Mathematics - Calculus',
-          description: 'Chapter 5: Derivatives and Applications',
-          deadline: DateTime.now().add(const Duration(days: 2)),
-          estimatedDuration: 120,
-          priority: TaskPriority.high,
-          status: TaskStatus.inProgress,
-          category: TaskCategory.mathematics,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        TaskModel(
-          id: const Uuid().v4(),
-          userId: 'demo',
-          title: 'History Essay',
-          description: 'World War II: Causes and Consequences',
-          deadline: DateTime.now().add(const Duration(days: 4)),
-          estimatedDuration: 180,
-          priority: TaskPriority.medium,
-          status: TaskStatus.pending,
-          category: TaskCategory.history,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-        TaskModel(
-          id: const Uuid().v4(),
-          userId: 'demo',
-          title: 'Chemistry Lab',
-          description: 'Organic Synthesis Experiment',
-          deadline: DateTime.now().add(const Duration(days: 7)),
-          estimatedDuration: 150,
-          priority: TaskPriority.medium,
-          status: TaskStatus.pending,
-          category: TaskCategory.science,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      ]);
-
-      _isLoading = false;
-      notifyListeners();
+      _tasks =
+          response.map<TaskModel>((json) => TaskModel.fromJson(json)).toList();
     } catch (e) {
-      _error = 'Failed to fetch tasks: ${e.toString()}';
+      _error = 'Failed to fetch tasks: $e';
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -103,18 +63,18 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate create delay
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      _tasks.add(task);
-      _isLoading = false;
+      final response =
+          await _supabase.from('tasks').insert(task.toJson()).select().single();
+      final newTask = TaskModel.fromJson(response);
+      _tasks.insert(0, newTask);
       notifyListeners();
       return true;
     } catch (e) {
-      _error = 'Failed to create task: ${e.toString()}';
+      _error = 'Failed to create task: $e';
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 
@@ -124,21 +84,67 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate update delay
-      await Future.delayed(const Duration(milliseconds: 500));
+      await _updateStreaksAndXP(task.userId, task.priority, task.streakBonus);
+
+      final response = await _supabase
+          .from('tasks')
+          .upsert(task.toJson())
+          .eq('id', task.id)
+          .select()
+          .single();
 
       final index = _tasks.indexWhere((t) => t.id == task.id);
       if (index != -1) {
-        _tasks[index] = task;
+        _tasks[index] = TaskModel.fromJson(response);
       }
-      _isLoading = false;
+
       notifyListeners();
       return true;
     } catch (e) {
-      _error = 'Failed to update task: ${e.toString()}';
+      _error = 'Failed to update task: $e';
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
+    }
+  }
+
+  Future<void> _updateStreaksAndXP(
+      String userId, TaskPriority priority, int bonus) async {
+    try {
+      final int priorityXP = switch (priority) {
+        TaskPriority.low => 10,
+        TaskPriority.medium => 25,
+        TaskPriority.high => 50,
+      };
+      final int totalXP = priorityXP + bonus;
+
+      final user = await _supabase
+          .from('users')
+          .select()
+          .eq('id', userId)
+          .single() as Map<String, dynamic>;
+      final int currentXP = user['xp_points'] as int? ?? 0;
+      final int currentStreak = user['current_streak'] as int? ?? 0;
+
+      // Check for overdue tasks
+      final now = DateTime.now();
+      final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+      final overdueResponse = await _supabase
+          .from('tasks')
+          .select('id')
+          .eq('user_id', userId)
+          .not('completed', 'eq', true)
+          .lt('deadline', endOfToday.toIso8601String());
+      final bool hasOverdue = overdueResponse.isNotEmpty;
+
+      await _supabase.from('users').update({
+        'xp_points': currentXP + totalXP,
+        'current_streak': hasOverdue ? 0 : currentStreak + 1,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', userId);
+    } catch (e) {
+      print('Stats update failed: $e');
     }
   }
 
@@ -148,18 +154,16 @@ class TaskViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate delete delay
-      await Future.delayed(const Duration(milliseconds: 500));
-
+      await _supabase.from('tasks').delete().eq('id', taskId);
       _tasks.removeWhere((t) => t.id == taskId);
-      _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      _error = 'Failed to delete task: ${e.toString()}';
+      _error = 'Failed to delete task: $e';
+      return false;
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return false;
     }
   }
 

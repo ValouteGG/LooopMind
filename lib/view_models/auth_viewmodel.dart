@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/user_model.dart';
+import '../../models/user_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -21,38 +21,42 @@ class AuthViewModel extends ChangeNotifier {
     if (session != null && session.user.id.isNotEmpty) {
       try {
         final response = await _supabase
-            .from('profiles')
+            .from('users')
             .select()
             .eq('id', session.user.id)
-            .maybeSingle(); // Use maybeSingle to handle missing profile
+            .maybeSingle();
 
         if (response != null) {
           _user = UserModel(
             id: response['id'] as String,
-            email: session.user.email ?? '',
-            name: response['name'] as String? ?? '',
-            photoUrl: response['photo_url'] as String?,
+            email: response['email'] as String,
+            currentStreak: (response['current_streak'] as int?) ?? 0,
+            longestStreak: (response['longest_streak'] as int?) ?? 0,
+            xpPoints: (response['xp_points'] as int?) ?? 0,
+            avatarUrl: response['avatar_url'] as String?,
             createdAt: DateTime.parse(response['created_at'].toString()),
             updatedAt: DateTime.parse(response['updated_at'].toString()),
           );
         } else {
+          // Fallback - insert basic user with required email
+          final userEmail =
+              session.user.email ?? 'user@${session.user.id.split('-')[0]}.com';
+          await _supabase.from('users').upsert({
+            'id': session.user.id,
+            'email': userEmail,
+          });
           _user = UserModel(
             id: session.user.id,
-            email: session.user.email ?? '',
-            name: '',
-            photoUrl: null,
+            email: userEmail,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
         }
       } catch (e) {
-        print('Profile fetch error: $e');
-        // Fallback user without profile
+        print('User fetch error: $e');
         _user = UserModel(
           id: session.user.id,
           email: session.user.email ?? '',
-          name: '',
-          photoUrl: null,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -78,15 +82,11 @@ class AuthViewModel extends ChangeNotifier {
       await checkAuthStatus();
       return true;
     } on AuthException catch (e) {
-      if (e.message.contains('Invalid login credentials') ||
-          e.message.contains('Invalid password')) {
-        _error = 'Incorrect email or password';
-      } else {
-        _error = 'Login failed: ${e.message}';
-      }
+      _error =
+          e.message.contains('Invalid') ? 'Invalid credentials' : e.message;
       return false;
     } catch (e) {
-      _error = 'Login failed: ${e.toString()}';
+      _error = 'Login failed: $e';
       return false;
     } finally {
       _isLoading = false;
@@ -94,7 +94,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> signup(String email, String password, String name) async {
+  Future<bool> signup(String email, String password) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -106,31 +106,21 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (response.user != null) {
-        await _supabase.from('profiles').upsert({
+        // User table insert triggered by auth? Or upsert
+        await _supabase.from('users').upsert({
           'id': response.user!.id,
-          'name': name,
+          'email': email,
         });
-        _error =
-            'Signup successful! Please check your email to confirm your account.';
-      } else {
-        _error =
-            'Signup response missing user. Check Supabase settings (email confirmation may be enabled).';
-        return false;
-      }
-
-      await checkAuthStatus();
-      return true;
-    } on AuthException catch (e) {
-      if (e.message.contains('already registered') ||
-          e.message.contains('duplicate key') ||
-          e.message.contains('already exists')) {
-        _error = 'User already exists';
-      } else {
-        _error = 'Sign up failed: ${e.message}';
+        await checkAuthStatus();
+        _error = 'Check email for confirmation';
+        return true;
       }
       return false;
+    } on AuthException catch (e) {
+      _error = 'Signup failed: ${e.message}';
+      return false;
     } catch (e) {
-      _error = 'Sign up failed: ${e.toString()}';
+      _error = 'Signup failed: $e';
       return false;
     } finally {
       _isLoading = false;
@@ -139,34 +129,26 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _supabase.auth.signOut();
-      _user = null;
-      _error = null;
-    } catch (e) {
-      _error = 'Logout failed';
-    }
-
-    _isLoading = false;
+    await _supabase.auth.signOut();
+    _user = null;
     notifyListeners();
   }
 
-  Future<bool> updateUser(String name) async {
+  Future<bool> updateUser(UserModel updatedUser) async {
     if (_user == null) return false;
     try {
-      await _supabase
-          .from('profiles')
-          .upsert({'id': _user!.id, 'name': name}).eq('id', _user!.id);
-
-      _user = _user!.copyWith(name: name, updatedAt: DateTime.now());
+      final data = {
+        'id': updatedUser.id,
+        'avatar_url': updatedUser.avatarUrl,
+        // Add other fields if editable
+        'updated_at': updatedUser.updatedAt.toIso8601String(),
+      };
+      await _supabase.from('users').upsert(data);
+      _user = updatedUser;
       notifyListeners();
       return true;
     } catch (e) {
       _error = 'Update failed: $e';
-      notifyListeners();
       return false;
     }
   }

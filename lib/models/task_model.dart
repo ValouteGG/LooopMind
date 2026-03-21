@@ -1,39 +1,63 @@
 enum TaskPriority { low, medium, high }
-enum TaskStatus { pending, inProgress, completed }
-enum TaskCategory { mathematics, science, languages, history, arts, other }
 
 class TaskModel {
   final String id;
   final String userId;
   final String title;
-  final String description;
+  final String? description;
   final DateTime deadline;
-  final int estimatedDuration;
   final TaskPriority priority;
-  final TaskStatus status;
-  final TaskCategory category;
+  final bool completed;
+  final DateTime? completedAt;
+  final int streakBonus;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final bool isRecurring;
-  final String? recurrencePattern;
-  final List<String> tags;
 
   TaskModel({
     required this.id,
     required this.userId,
     required this.title,
-    required this.description,
+    this.description,
     required this.deadline,
-    required this.estimatedDuration,
     this.priority = TaskPriority.medium,
-    this.status = TaskStatus.pending,
-    this.category = TaskCategory.other,
+    this.completed = false,
+    this.completedAt,
+    this.streakBonus = 0,
     required this.createdAt,
     required this.updatedAt,
-    this.isRecurring = false,
-    this.recurrencePattern,
-    this.tags = const [],
   });
+
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    return TaskModel(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      deadline: DateTime.parse(json['deadline'] as String),
+      priority: TaskPriority.values.byName(json['priority'] as String),
+      completed: json['completed'] as bool? ?? false,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'] as String)
+          : null,
+      streakBonus: json['streak_bonus'] as int? ?? 0,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'user_id': userId,
+        'title': title,
+        'description': description,
+        'deadline': deadline.toIso8601String(),
+        'priority': priority.name,
+        'completed': completed,
+        'completed_at': completedAt?.toIso8601String(),
+        'streak_bonus': streakBonus,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
 
   TaskModel copyWith({
     String? id,
@@ -41,15 +65,12 @@ class TaskModel {
     String? title,
     String? description,
     DateTime? deadline,
-    int? estimatedDuration,
     TaskPriority? priority,
-    TaskStatus? status,
-    TaskCategory? category,
+    bool? completed,
+    DateTime? completedAt,
+    int? streakBonus,
     DateTime? createdAt,
     DateTime? updatedAt,
-    bool? isRecurring,
-    String? recurrencePattern,
-    List<String>? tags,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -57,15 +78,12 @@ class TaskModel {
       title: title ?? this.title,
       description: description ?? this.description,
       deadline: deadline ?? this.deadline,
-      estimatedDuration: estimatedDuration ?? this.estimatedDuration,
       priority: priority ?? this.priority,
-      status: status ?? this.status,
-      category: category ?? this.category,
+      completed: completed ?? this.completed,
+      completedAt: completedAt ?? this.completedAt,
+      streakBonus: streakBonus ?? this.streakBonus,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      isRecurring: isRecurring ?? this.isRecurring,
-      recurrencePattern: recurrencePattern ?? this.recurrencePattern,
-      tags: tags ?? this.tags,
     );
   }
 }

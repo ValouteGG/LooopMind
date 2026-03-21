@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_viewmodel.dart';
-import '../../widgets/custom_textfield.dart'; // Reuse if exists, else TextField
+import '../../widgets/custom_textfield.dart';
+import '../../widgets/custom_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({Key? key}) : super(key: key);
@@ -12,32 +13,39 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
+  final _avatarUrlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    final authVM = context.read<AuthViewModel>();
-    _nameController = TextEditingController(text: authVM.user?.name ?? '');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authVM = context.read<AuthViewModel>();
+      if (authVM.user != null) {
+        _avatarUrlController.text = authVM.user!.avatarUrl ?? '';
+      }
+    });
   }
 
-  Future<void> _saveProfile() async {
+  Future<void> _saveProfile(AuthViewModel authVM) async {
     if (_formKey.currentState!.validate()) {
-      final success =
-          await context.read<AuthViewModel>().updateUser(_nameController.text);
+      final updatedUser = authVM.user!.copyWith(
+        avatarUrl: _avatarUrlController.text.trim().isEmpty
+            ? null
+            : _avatarUrlController.text.trim(),
+        updatedAt: DateTime.now(),
+      );
+      final success = await authVM.updateUser(updatedUser);
       if (success) {
-        if (context.mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully')),
+            const SnackBar(content: Text('Profile updated')),
           );
           Navigator.pop(context);
         }
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to update profile')),
-          );
-        }
+        if (mounted)
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Update failed')));
       }
     }
   }
@@ -45,9 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-      ),
+      appBar: AppBar(title: const Text('Edit Profile')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -55,44 +61,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blue,
-                child: Icon(Icons.person, size: 50, color: Colors.white),
+              const SizedBox(height: 24),
+              const Center(
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.blue,
+                  child: Icon(Icons.person, size: 50, color: Colors.white),
+                ),
               ),
               const SizedBox(height: 24),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
+              CustomTextField(
+                controller: _avatarUrlController,
+                label: 'Avatar URL',
+                hintText: 'https://example.com/avatar.png',
               ),
               const SizedBox(height: 16),
               Consumer<AuthViewModel>(
-                builder: (context, authVM, _) => TextFormField(
-                  initialValue: authVM.user?.email ?? '',
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  enabled: false,
+                builder: (context, authVM, _) => CustomTextField(
+                  controller:
+                      TextEditingController(text: authVM.user?.email ?? ''),
+                  label: 'Email',
+                  hintText: 'email@example.com',
                 ),
               ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveProfile,
-                  child: const Text('Save Changes'),
+                child: Consumer<AuthViewModel>(
+                  builder: (context, authVM, _) => CustomButton(
+                    text: 'Save Changes',
+                    isLoading: authVM.isLoading,
+                    onPressed: () => _saveProfile(authVM),
+                  ),
                 ),
               ),
             ],
@@ -104,7 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _avatarUrlController.dispose();
     super.dispose();
   }
 }

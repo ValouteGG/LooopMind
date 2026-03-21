@@ -1,51 +1,36 @@
 import 'package:flutter/material.dart';
-import '../models/analytics_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../models/weekly_summary_model.dart';
 
 class AnalyticsViewModel extends ChangeNotifier {
-  AnalyticsModel? _analytics;
+  final SupabaseClient _supabase = Supabase.instance.client;
+  List<WeeklySummaryModel> _summaries = [];
   bool _isLoading = false;
   String? _error;
 
-  AnalyticsModel? get analytics => _analytics;
+  List<WeeklySummaryModel> get summaries => _summaries;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  int get totalHours {
-    return (_analytics?.totalStudyMinutes ?? 0) ~/ 60;
-  }
-
-  int get totalMinutes {
-    return (_analytics?.totalStudyMinutes ?? 0) % 60;
-  }
-
-  Future<void> fetchAnalytics(String userId) async {
+  Future<void> fetchWeeklySummaries(String userId) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Simulate fetch delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      final response = await _supabase
+          .from('weekly_summaries')
+          .select()
+          .eq('user_id', userId)
+          .order('week_start', ascending: false)
+          .limit(4); // Last 4 weeks
 
-      _analytics = AnalyticsModel(
-        userId: userId,
-        weekStart: DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1)),
-        totalStudyMinutes: 750,
-        tasksCompleted: 8,
-        completionRate: 92.0,
-        studyTimeBySubject: {
-          'Mathematics': 510,
-          'Science': 360,
-          'Languages': 270,
-          'History': 180,
-        },
-        currentStreak: 12,
-        dailyMinutes: [120, 150, 90, 180, 100, 110, 0],
-      );
-      _isLoading = false;
-      notifyListeners();
+      _summaries = response
+          .map<WeeklySummaryModel>((json) => WeeklySummaryModel.fromJson(json))
+          .toList();
     } catch (e) {
-      _error = 'Failed to fetch analytics: ${e.toString()}';
+      _error = 'Failed to fetch summaries: $e';
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
