@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'routes/app_routes.dart';
 import 'view_models/auth_viewmodel.dart';
@@ -16,11 +17,11 @@ Future<void> main() async {
   await Supabase.initialize(
       url: 'https://eajdvrukcjkkfcjaxqeb.supabase.co',
       anonKey: 'sb_publishable_vfmWmfQz5w_91mGasyrzLw_4y0KLZ9k');
-  runApp(const LoopMindApp());
+  runApp(MyApp());
 }
 
-class LoopMindApp extends StatelessWidget {
-  const LoopMindApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,56 +36,71 @@ class LoopMindApp extends StatelessWidget {
       child: Consumer<ThemeViewModel>(
         builder: (context, themeVM, child) => MaterialApp(
           title: 'LoopMind',
-          theme: _buildTheme(),
-          darkTheme: _buildDarkTheme(),
+          theme: lightTheme,
+          darkTheme: darkTheme,
           themeMode: themeVM.currentMode,
           onGenerateRoute: AppRoutes.generateRoute,
-          home: const _AuthWrapper(),
+          home: const AuthWrapper(),
           debugShowCheckedModeBanner: false,
         ),
       ),
     );
   }
 
-  ThemeData _buildTheme() {
-    return ThemeData(
+  static ThemeData get lightTheme {
+    final base = ThemeData.light();
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF1E40AF), // Navy academics
+      brightness: Brightness.light,
+    );
+    return base.copyWith(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF6366F1),
-        brightness: Brightness.light,
+      colorScheme: scheme.copyWith(
+        secondary: const Color(0xFF10B981), // Productivity teal
+        tertiary: const Color(0xFFF59E0B), // Rewards gold
+        surface: const Color(0xFFF8FAFC),
       ),
-      fontFamily: 'Poppins',
+      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
+        backgroundColor: Color(0xFFF8FAFC),
       ),
     );
   }
 
-  ThemeData _buildDarkTheme() {
-    return ThemeData(
+  static ThemeData get darkTheme {
+    final base = ThemeData.dark();
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF1E40AF),
+      brightness: Brightness.dark,
+    );
+    return base.copyWith(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF6366F1),
-        brightness: Brightness.dark,
+      colorScheme: scheme.copyWith(
+        secondary: const Color(0xFF34D399),
+        tertiary: const Color(0xFFFCD34D),
+        surface: const Color(0xFF0F172A),
+        onSurface: Colors.white70,
       ),
-      fontFamily: 'Poppins',
+      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
+        backgroundColor: Color(0xFF0F172A),
       ),
     );
   }
 }
 
-class _AuthWrapper extends StatefulWidget {
-  const _AuthWrapper({Key? key}) : super(key: key);
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
 
   @override
-  State<_AuthWrapper> createState() => _AuthWrapperState();
+  State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<_AuthWrapper> {
+class _AuthWrapperState extends State<AuthWrapper> {
   @override
   void initState() {
     super.initState();

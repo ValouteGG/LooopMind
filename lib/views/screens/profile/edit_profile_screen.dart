@@ -52,6 +52,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile')),
       body: Padding(
@@ -62,11 +63,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              const Center(
+              Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundColor: Colors.blue,
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
+                  backgroundColor: primaryColor,
+                  child:
+                      const Icon(Icons.person, size: 50, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 24),

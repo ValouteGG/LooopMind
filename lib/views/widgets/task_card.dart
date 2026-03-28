@@ -18,11 +18,11 @@ class TaskCard extends StatelessWidget {
   Color _getPriorityColor(TaskPriority priority) {
     switch (priority) {
       case TaskPriority.high:
-        return Colors.red;
+        return Colors.red.shade400;
       case TaskPriority.medium:
-        return Colors.orange;
+        return Colors.orange.shade400;
       case TaskPriority.low:
-        return Colors.green;
+        return Colors.green.shade400;
     }
   }
 
@@ -38,23 +38,23 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final priorityColor = _getPriorityColor(task.priority);
+    final cardBg = isDark ? Colors.grey.shade900 : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [Colors.grey.shade900!, Colors.grey.shade800!]
-              : [Colors.white, Colors.grey.shade50!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: cardBg,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: priorityColor.withOpacity(0.3),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: priorityColor.withOpacity(0.1),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -80,17 +80,12 @@ class TaskCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.purple.shade400,
-                              Colors.purple.shade600
-                            ],
-                          ),
+                          color: priorityColor.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
                           task.completed ? Icons.emoji_events : Icons.school,
-                          color: Colors.white,
+                          color: priorityColor,
                           size: 20,
                         ),
                       ),
@@ -101,16 +96,19 @@ class TaskCard extends StatelessWidget {
                           children: [
                             Text(
                               task.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                color: textColor,
                               ),
                             ),
                             if (task.description != null) ...[
                               const SizedBox(height: 4),
                               Text(
                                 task.description!,
-                                style: const TextStyle(color: Colors.grey),
+                                style: TextStyle(
+                                  color: textColor.withOpacity(0.7),
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -120,8 +118,7 @@ class TaskCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: _getPriorityColor(task.priority)
-                                    .withOpacity(0.2),
+                                color: priorityColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -133,7 +130,7 @@ class TaskCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  color: _getPriorityColor(task.priority),
+                                  color: priorityColor,
                                 ),
                               ),
                             ),
@@ -145,13 +142,15 @@ class TaskCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(Icons.access_time,
-                          size: 16, color: Colors.grey),
+                      Icon(Icons.access_time,
+                          size: 16, color: textColor.withOpacity(0.7)),
                       const SizedBox(width: 4),
                       Text(
                         _formatTimeRemaining(task.deadline),
-                        style:
-                            const TextStyle(color: Colors.grey, fontSize: 12),
+                        style: TextStyle(
+                          color: textColor.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
                       ),
                       if (task.streakBonus > 0) ...[
                         const SizedBox(width: 16),
@@ -189,15 +188,14 @@ class TaskCard extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: onEdit,
-                            icon: const Icon(Icons.edit,
-                                size: 16, color: Colors.blue),
-                            label: const Text('Edit',
+                            icon:
+                                Icon(Icons.edit, size: 16, color: primaryColor),
+                            label: Text('Edit',
                                 style: TextStyle(
-                                    color: Colors.blue,
+                                    color: primaryColor,
                                     fontWeight: FontWeight.w600)),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                  color: Colors.blue, width: 2),
+                              side: BorderSide(color: primaryColor, width: 2),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 10),
                             ),
