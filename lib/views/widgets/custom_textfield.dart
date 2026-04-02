@@ -38,7 +38,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
       children: [
         Text(
           widget.label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -51,7 +55,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             suffixIcon: widget.obscureText
                 ? IconButton(
-                    icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility),
                     onPressed: () {
                       setState(() => _obscureText = !_obscureText);
                     },

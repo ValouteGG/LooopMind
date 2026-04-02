@@ -1,7 +1,14 @@
-# Task: Enable past date selection for tasks
+# Splash and Theme Enhancement Progress
 
-## Steps:
-- [x] Step 1: Edit lib/views/screens/tasks/create_task_screen.dart (update deadline init and date picker firstDate)
-- [x] Step 2: Edit lib/views/screens/tasks/task_detail_screen.dart (update date picker firstDate)
-- [ ] Step 3: Test changes by creating/editing tasks with past dates
-- [ ] Step 4: Complete task
+**Approved Plan Summary:**
+- Add splash screen with logo upon app open.
+- Update header colors to flowy academic scheme (violet-cyan-gold gradients).
+
+**Steps:**
+1. [x] Create `lib/views/screens/splash/splash_screen.dart`
+2. [x] Update `pubspec.yaml` (add assets)
+3. [x] Update `lib/main.dart` (home → SplashScreen, new theme colors/gradients)
+4. [ ] Run `flutter pub get` and test (`flutter run`)
+5. [ ] User adds `assets/images/logo.png` & verify
+
+**Status:** Code complete, themes fixed. Ready for `flutter pub get` and test.

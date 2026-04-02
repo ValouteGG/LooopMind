@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.pushNamed(context, '/create-task'),
         icon: const Icon(Icons.add),
         label: const Text('New Task'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }

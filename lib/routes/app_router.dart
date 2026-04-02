@@ -8,8 +8,8 @@ class AppRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Recipes App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'LoopMind',
+      theme: ThemeData(),
       initialRoute: '/',
       routes: {
         '/': (context) => const AuthChecker(),

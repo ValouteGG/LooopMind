@@ -8,8 +8,9 @@ class GroqService {
   factory GroqService() => _instance;
   GroqService._internal();
 
-  static const String _apiKey =
-      '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'; // https://console.groq.com/keys
+  static const String
+      _apiKey = //changeable anytime if api key is revoked due to github exposure
+      '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';
   static const String _baseUrl =
       'https://api.groq.com/openai/v1/chat/completions';
 

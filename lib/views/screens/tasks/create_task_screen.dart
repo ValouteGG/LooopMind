@@ -119,7 +119,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary),
                   onPressed: _isLoading ? null : _createTask,
                   child: _isLoading
                       ? const SizedBox(

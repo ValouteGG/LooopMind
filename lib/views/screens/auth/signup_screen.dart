@@ -39,12 +39,22 @@ class _SignupScreenState extends State<SignupScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
-                    const Text('Create Account',
+                    Text('Create Account',
                         style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold)),
+                          fontSize: 36,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1,
+                        )),
                     const SizedBox(height: 12),
-                    const Text('Start your learning journey',
-                        style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text('Start your learning journey',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.7),
+                          height: 1.3,
+                        )),
                     const SizedBox(height: 40),
                     if (authVM.error != null) ...[
                       Container(
