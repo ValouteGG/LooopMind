@@ -33,15 +33,22 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.label,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurface,
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -50,13 +57,34 @@ class _CustomTextFieldState extends State<CustomTextField> {
           keyboardType: widget.keyboardType,
           obscureText: _obscureText,
           validator: widget.validator,
+          style: TextStyle(color: colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)),
+            filled: true,
+            fillColor: isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.black.withOpacity(0.05),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(2),
+              borderSide:
+                  BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(2),
+              borderSide:
+                  BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(2),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            ),
             suffixIcon: widget.obscureText
                 ? IconButton(
                     icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility),
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
                     onPressed: () {
                       setState(() => _obscureText = !_obscureText);
                     },

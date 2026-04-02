@@ -1,14 +1,11 @@
-# Splash and Theme Enhancement Progress
+# Fix CreateTask Screen Visibility Issue
 
-**Approved Plan Summary:**
-- Add splash screen with logo upon app open.
-- Update header colors to flowy academic scheme (violet-cyan-gold gradients).
+## Steps:
+- [x] Step 1: Create this TODO.md (current)
+- [x] Step 2: Update CustomTextField to use theme colors (onSurface) instead of hardcoded white
+- [ ] Step 3: Test in light/dark mode - verify labels and text fields visible in CreateTask screen
+- [ ] Step 4: Run `flutter analyze` and hot reload
+- [ ] Step 5: Mark complete, run `flutter pub get` if needed, attempt_completion
 
-**Steps:**
-1. [x] Create `lib/views/screens/splash/splash_screen.dart`
-2. [x] Update `pubspec.yaml` (add assets)
-3. [x] Update `lib/main.dart` (home → SplashScreen, new theme colors/gradients)
-4. [ ] Run `flutter pub get` and test (`flutter run`)
-5. [ ] User adds `assets/images/logo.png` & verify
-
-**Status:** Code complete, themes fixed. Ready for `flutter pub get` and test.
+**Root cause**: CustomTextField hardcoded Colors.white invisible on light theme scaffold background.
+**Files**: lib/views/widgets/custom_textfield.dart (updated)
