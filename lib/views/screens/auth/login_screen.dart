@@ -31,14 +31,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
-                    const Text(
+                    Text(
                       'Welcome Back',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Continue your learning journey',
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.7),
+                        height: 1.3,
+                      ),
                     ),
                     const SizedBox(height: 40),
                     if (authVM.error != null)
@@ -50,7 +61,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Text(
                           authVM.error!,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            height: 1.3,
+                          ),
                         ),
                       ),
                     if (authVM.error != null) const SizedBox(height: 20),
@@ -71,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       hintText: 'password123',
                       obscureText: true,
                       validator: (value) {
-                        if (value?.isEmpty ?? true) return 'Password is required';
+                        if (value?.isEmpty ?? true)
+                          return 'Password is required';
                         return null;
                       },
                     ),
@@ -80,7 +96,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
-                        child: const Text('Forgot Password?'),
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),

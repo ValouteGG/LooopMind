@@ -9,6 +9,7 @@ import 'view_models/settings_viewmodel.dart';
 import 'view_models/theme_viewmodel.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/home/home_screen.dart';
+import 'views/screens/splash/splash_screen.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
           darkTheme: darkTheme,
           themeMode: themeVM.currentMode,
           onGenerateRoute: AppRoutes.generateRoute,
-          home: const AuthWrapper(),
+          home: const SplashScreen(),
           debugShowCheckedModeBanner: false,
         ),
       ),
@@ -50,21 +51,29 @@ class MyApp extends StatelessWidget {
   static ThemeData get lightTheme {
     final base = ThemeData.light();
     final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E40AF), // Navy academics
+      seedColor: const Color(0xFF7C3AED), // Flowy violet academic
       brightness: Brightness.light,
     );
     return base.copyWith(
       useMaterial3: true,
       colorScheme: scheme.copyWith(
-        secondary: const Color(0xFF10B981), // Productivity teal
-        tertiary: const Color(0xFFF59E0B), // Rewards gold
-        surface: const Color(0xFFF8FAFC),
+        secondary: const Color(0xFF06B6D4), // Cyan flow
+        tertiary: const Color(0xFFFCD34D), // Gold accent
+        surface: const Color(0xFFFAF5FF), // Soft lavender surface
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Color(0xFFF8FAFC),
+        backgroundColor: const Color(0xFF8B5CF6),
+        foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+        ),
+        shadowColor: Colors.black.withOpacity(0.2),
+        surfaceTintColor: Colors.transparent,
       ),
     );
   }
@@ -72,22 +81,30 @@ class MyApp extends StatelessWidget {
   static ThemeData get darkTheme {
     final base = ThemeData.dark();
     final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF1E40AF),
+      seedColor: const Color(0xFF7C3AED),
       brightness: Brightness.dark,
     );
     return base.copyWith(
       useMaterial3: true,
       colorScheme: scheme.copyWith(
-        secondary: const Color(0xFF34D399),
-        tertiary: const Color(0xFFFCD34D),
-        surface: const Color(0xFF0F172A),
+        secondary: const Color(0xFF0EA5E9),
+        tertiary: const Color(0xFFEAB308),
+        surface: const Color(0xFF1E1B4B), // Dark purple surface
         onSurface: Colors.white70,
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Color(0xFF0F172A),
+        backgroundColor: const Color(0xFF7C3AED),
+        foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+        ),
+        shadowColor: Colors.black.withOpacity(0.3),
+        surfaceTintColor: Colors.transparent,
       ),
     );
   }
