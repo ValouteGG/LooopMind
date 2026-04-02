@@ -62,18 +62,16 @@ class MyApp extends StatelessWidget {
         surface: const Color(0xFFFAF5FF), // Soft lavender surface
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: const Color(0xFF8B5CF6),
+        backgroundColor: Color(0xFF8B5CF6),
         foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
           fontSize: 20,
         ),
-        shadowColor: Colors.black.withOpacity(0.2),
-        surfaceTintColor: Colors.transparent,
       ),
     );
   }
@@ -93,18 +91,16 @@ class MyApp extends StatelessWidget {
         onSurface: Colors.white70,
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: Color(0xFF7C3AED),
         foregroundColor: Colors.white,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.w600,
           fontSize: 20,
         ),
-        shadowColor: Colors.black.withOpacity(0.3),
-        surfaceTintColor: Colors.transparent,
       ),
     );
   }

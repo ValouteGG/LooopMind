@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../view_models/auth_viewmodel.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/oauth_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,25 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
-                    Text(
+                    const Text(
                       'Welcome Back',
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                      ),
+                      style:
+                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
-                    Text(
+                    const Text(
                       'Continue your learning journey',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.7),
-                        height: 1.3,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 40),
                     if (authVM.error != null)
@@ -61,11 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Text(
                           authVM.error!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.red,
-                            height: 1.3,
-                          ),
+                          style: const TextStyle(color: Colors.red),
                         ),
                       ),
                     if (authVM.error != null) const SizedBox(height: 20),
@@ -96,13 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        child: const Text('Forgot Password?'),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -132,7 +113,36 @@ class _LoginScreenState extends State<LoginScreen> {
                         Expanded(child: Divider()),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
+                    // OAuth Buttons
+                    Column(
+                      children: [
+                        OAuthButton(
+                          icon: Icons.g_mobiledata,
+                          label: 'Continue with Google',
+                          onPressed: () => context
+                              .read<AuthViewModel>()
+                              .signInWithOAuth('google'),
+                        ),
+                        const SizedBox(height: 12),
+                        OAuthButton(
+                          icon: Icons.facebook,
+                          label: 'Continue with Facebook',
+                          onPressed: () => context
+                              .read<AuthViewModel>()
+                              .signInWithOAuth('facebook'),
+                        ),
+                        const SizedBox(height: 12),
+                        OAuthButton(
+                          icon: Icons.code,
+                          label: 'Continue with GitHub',
+                          onPressed: () => context
+                              .read<AuthViewModel>()
+                              .signInWithOAuth('github'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

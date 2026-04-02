@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/user_model.dart';
 
@@ -121,6 +122,38 @@ class AuthViewModel extends ChangeNotifier {
       return false;
     } catch (e) {
       _error = 'Signup failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> signInWithOAuth(String provider) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      OAuthProvider selectedProvider;
+      switch (provider.toLowerCase()) {
+        case 'google':
+          selectedProvider = OAuthProvider.google;
+          break;
+        case 'facebook':
+          selectedProvider = OAuthProvider.facebook;
+          break;
+        case 'github':
+          selectedProvider = OAuthProvider.github;
+          break;
+        default:
+          throw Exception('Unsupported provider: $provider');
+      }
+      await _supabase.auth.signInWithOAuth(selectedProvider);
+      await checkAuthStatus();
+      return true;
+    } catch (e) {
+      _error = 'OAuth login failed: $e';
       return false;
     } finally {
       _isLoading = false;
