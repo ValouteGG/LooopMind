@@ -30,8 +30,9 @@ class OAuthButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           side: BorderSide(
               color: Theme.of(context).colorScheme.outline.withOpacity(0.6)),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(2),
+          ),
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),

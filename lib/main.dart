@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         tertiary: const Color(0xFFFCD34D), // Gold accent
         surface: const Color(0xFFFAF5FF), // Soft lavender surface
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
+      textTheme: GoogleFonts.interTextTheme(base.textTheme),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
         surface: const Color(0xFF1E1B4B), // Dark purple surface
         onSurface: Colors.white70,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme),
+      textTheme: GoogleFonts.interTextTheme(base.textTheme),
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
