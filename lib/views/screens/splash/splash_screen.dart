@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/theme_viewmodel.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../view_models/theme_viewmodel.dart';
 import '../../../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -82,89 +79,92 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topLeft,
-            colors: [
-              Color(0xFF8B5CF6),
-              Color(0xFF7C3AED),
-              Color(0xFF06B6D4),
-            ],
-            stops: [0.0, 0.6, 1.0],
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment.topLeft,
+              colors: [
+                Color(0xFF8B5CF6),
+                Color(0xFF7C3AED),
+                Color(0xFF06B6D4),
+              ],
+              stops: [0.0, 0.6, 1.0],
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Center(
-                    child: ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 60),
-                          const Text(
-                            'LoopMind',
-                            style: TextStyle(
-                              fontSize: 52,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: 2,
-                              shadows: [
-                                Shadow(
-                                  offset: Offset(0, 6),
-                                  blurRadius: 12,
-                                  color: Colors.black45,
-                                ),
-                              ],
+          child: Column(
+            children: [
+              Expanded(
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Center(
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: 60),
+                            const Text(
+                              'LoopMind',
+                              style: TextStyle(
+                                fontSize: 52,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: 2,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(0, 6),
+                                    blurRadius: 12,
+                                    color: Colors.black45,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Academic Flow',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.white.withOpacity(0.98),
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5,
+                            const SizedBox(height: 16),
+                            Text(
+                              'Academic Flow',
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.white.withOpacity(0.98),
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.5,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            // Animated loading at bottom
-            Padding(
-              padding: const EdgeInsets.only(bottom: 100),
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(seconds: 2),
-                builder: (context, value, child) {
-                  return Transform.translate(
-                    offset: Offset(0, 20 * (1 - value)),
-                    child: Opacity(
-                      opacity: value,
-                      child: const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        strokeWidth: 5,
-                        strokeCap: StrokeCap.round,
+              // Animated loading at bottom
+              Padding(
+                padding: const EdgeInsets.only(bottom: 100),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(seconds: 2),
+                  builder: (context, value, child) {
+                    return Transform.translate(
+                      offset: Offset(0, 20 * (1 - value)),
+                      child: Opacity(
+                        opacity: value,
+                        child: const CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          strokeWidth: 5,
+                          strokeCap: StrokeCap.round,
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

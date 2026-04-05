@@ -10,6 +10,7 @@ import 'view_models/theme_viewmodel.dart';
 import 'views/screens/auth/login_screen.dart';
 import 'views/screens/home/home_screen.dart';
 import 'views/screens/splash/splash_screen.dart';
+import 'package:flutter/services.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,6 +19,11 @@ Future<void> main() async {
   await Supabase.initialize(
       url: 'https://eajdvrukcjkkfcjaxqeb.supabase.co',
       anonKey: 'sb_publishable_vfmWmfQz5w_91mGasyrzLw_4y0KLZ9k');
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+  ));
   runApp(MyApp());
 }
 
@@ -41,7 +47,7 @@ class MyApp extends StatelessWidget {
           darkTheme: darkTheme,
           themeMode: themeVM.currentMode,
           onGenerateRoute: AppRoutes.generateRoute,
-          home: const SplashScreen(),
+          home: const SafeArea(child: SplashScreen()),
           debugShowCheckedModeBanner: false,
         ),
       ),
