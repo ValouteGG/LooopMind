@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class ChartWidget extends StatelessWidget {
   final Map<String, int> studyTimeBySubject;
 
-  const ChartWidget({Key? key, required this.studyTimeBySubject}) : super(key: key);
+  const ChartWidget({Key? key, required this.studyTimeBySubject})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +19,15 @@ class ChartWidget extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text(entry.key,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600)),
                         Text('${entry.value} min'),
                       ],
                     ),
                     const SizedBox(height: 4),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(2),
                       child: LinearProgressIndicator(
                         value: entry.value / 600,
                         minHeight: 8,

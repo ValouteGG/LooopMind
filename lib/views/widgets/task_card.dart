@@ -46,7 +46,7 @@ class TaskCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(2),
         border: Border.all(
           color: priorityColor.withOpacity(0.3),
           width: 2,
@@ -63,7 +63,7 @@ class TaskCard extends StatelessWidget {
         children: [
           Material(
             color: Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(2),
             child: Padding(
               padding: EdgeInsets.fromLTRB(
                 task.completed ? 12.0 : 20.0,
@@ -81,7 +81,7 @@ class TaskCard extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: priorityColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                         child: Icon(
                           task.completed ? Icons.emoji_events : Icons.school,
@@ -119,7 +119,7 @@ class TaskCard extends StatelessWidget {
                                   horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: priorityColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(2),
                               ),
                               child: Text(
                                 task.priority

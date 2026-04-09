@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/theme_viewmodel.dart';
 import '../../../routes/app_routes.dart';
@@ -108,26 +109,33 @@ class _SplashScreenState extends State<SplashScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const SizedBox(height: 60),
-                            const Text(
+                            Image.asset(
+                              'assets/images/logo.png',
+                              height: 700,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(height: 60),
+                            Text(
                               'LoopMind',
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 52,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 letterSpacing: 2,
-                                shadows: [
-                                  Shadow(
-                                    offset: Offset(0, 6),
-                                    blurRadius: 12,
-                                    color: Colors.black45,
-                                  ),
-                                ],
-                              ),
+                              )..copyWith(
+                                  shadows: const [
+                                    Shadow(
+                                      offset: Offset(0, 6),
+                                      blurRadius: 12,
+                                      color: Colors.black45,
+                                    ),
+                                  ],
+                                ),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'Academic Flow',
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 24,
                                 color: Colors.white.withOpacity(0.98),
                                 fontWeight: FontWeight.w600,

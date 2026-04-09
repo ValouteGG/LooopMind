@@ -110,7 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: isUser
                           ? Theme.of(context).colorScheme.primary
                           : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                     child: Text(
                       msg.text,
