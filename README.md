@@ -29,20 +29,24 @@ To get a local copy up and running, follow these steps:
     ```bash
     git clone https://github.com/yourusername/LoopMind.git
     ```
+    
 2.  Navigate to the project directory:
     ```bash
     cd LoopMind
     ```
+    
 **3.  Get Flutter packages:**
     ```bash
     flutter pub get
     ```
+    
 **4.  Set up Environment Variables:**
     Create a `.env` file in the root directory and add your Supabase credentials:
     ```env
     SUPABASE_URL=your_supabase_url
     SUPABASE_ANON_KEY=your_supabase_anon_key
     ```
+    
 **5.  Run the application:**
     ```bash
     flutter run
