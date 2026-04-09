@@ -1,16 +1,63 @@
-# phonebook_app
+## LoopMind: Elevate Your Study Habits
 
-A new Flutter project.
+**LoopMind** is a mobile application designed to empower students by optimizing their study routines through intelligent tracking and personalized habit-building. Developed to bridge the gap between academic pressure and effective learning, LoopMind helps you stay consistent, focused, and organized.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
 
-A few resources to get you started if this is your first Flutter project:
+* **Smart Study Tracking:** Monitor your study sessions in real-time and gain insights into your most productive hours.
+* **Habit Formation:** Build lasting academic habits with streak tracking and milestone rewards.
+* **Progress Analytics:** Visualize your learning journey with detailed charts and statistics.
+* **Task Management:** Organize your assignments, exams, and projects within a unified dashboard.
+* **Personalized Reminders:** Get nudged at the right time to keep your momentum going.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🛠️ Tech Stack
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+LoopMind leverages a modern, scalable stack to provide a high-performance experience:
+
+* **Frontend:** [Flutter](https://flutter.dev/) (UI Toolkit)
+* **Language:** [Dart](https://dart.dev/)
+* **Backend/Database:** [Supabase](https://supabase.com/) (PostgreSQL database, Auth, and Realtime features)
+* **UI/UX:** Designed with a focus on student-centric accessibility and clean aesthetics.
+
+## 📦 Installation
+
+To get a local copy up and running, follow these steps:
+
+**1.**  Clone the repository:****
+    ```bash
+    git clone https://github.com/yourusername/LoopMind.git
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd LoopMind
+    ```
+**3.  Get Flutter packages:**
+    ```bash
+    flutter pub get
+    ```
+**4.  Set up Environment Variables:**
+    Create a `.env` file in the root directory and add your Supabase credentials:
+    ```env
+    SUPABASE_URL=your_supabase_url
+    SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+**5.  Run the application:**
+    ```bash
+    flutter run
+    ```
+
+## 🤝 Contributors
+
+This project was developed with passion by:
+
+Adrian Philip Amihan
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+*LoopMind — Master your mind, one loop at a time.*
