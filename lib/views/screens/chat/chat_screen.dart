@@ -89,67 +89,69 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Weekly Acitivy Summarizer'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                final isUser = msg.type == MessageType.user;
-                return Align(
-                  alignment:
-                      isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isUser
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: Text(
-                      msg.text,
-                      style: TextStyle(
-                        color: isUser ? Colors.white : Colors.black87,
-                        fontSize: 16,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final msg = _messages[index];
+                  final isUser = msg.type == MessageType.user;
+                  return Align(
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isUser
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        msg.text,
+                        style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black87,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message for the summarizer...',
-                      border: OutlineInputBorder(),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message for the summarizer...',
+                        border: OutlineInputBorder(),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
                     ),
-                    onSubmitted: (_) => _sendMessage(),
                   ),
-                ),
-                const SizedBox(width: 8),
-                FloatingActionButton(
-                  mini: true,
-                  onPressed: _sendMessage,
-                  child: const Icon(Icons.send),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  FloatingActionButton(
+                    mini: true,
+                    onPressed: _sendMessage,
+                    child: const Icon(Icons.send),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
